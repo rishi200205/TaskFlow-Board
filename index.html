@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>TaskFlow Board</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <header>
+        <h1>TaskFlow Board</h1>
+    </header>
+
+    <!-- Task Creation -->
+    <section class="task-input">
+        <form id="task-form">
+            <input type="text" id="task-title" placeholder="Task title" required />
+            <textarea id="task-description" placeholder="Task description (optional)"></textarea>
+            <button type="submit">Add Task</button>
+        </form>
+    </section>
+
+    <!-- Board -->
+    <main class="board">
+
+        <section class="column" data-status="todo">
+            <h2>Todo</h2>
+            <div class="task-list" id="todo-list"></div>
+        </section>
+
+        <section class="column" data-status="in-progress">
+            <h2>In Progress</h2>
+            <div class="task-list" id="in-progress-list"></div>
+        </section>
+
+        <section class="column" data-status="done">
+            <h2>Done</h2>
+            <div class="task-list" id="done-list"></div>
+        </section>
+
+    </main>
+
+    <script src="state.js"></script>
+    <script src="storage.js"></script>
+    <script src="utils.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
