@@ -1,0 +1,238 @@
+/* =========================================================
+   THEME VARIABLES — MODERN DARK SAAS
+   ========================================================= */
+:root {
+    --bg-main: #0f172a;
+    --bg-column: #111827;
+    --bg-card: #020617;
+
+    --text-main: #e5e7eb;
+    --text-muted: #9ca3af;
+
+    --primary: #38bdf8;
+    --primary-hover: #0ea5e9;
+
+    --todo: #64748b;
+    --progress: #fbbf24;
+    --done: #22c55e;
+
+    --radius: 12px;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.4);
+
+    --transition-fast: 0.2s ease;
+    --transition-slow: 0.35s ease;
+}
+
+/* =========================================================
+   RESET & BASE
+   ========================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: radial-gradient(circle at top, #020617, #0f172a 60%);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+header {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    padding: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+}
+
+/* =========================================================
+   TASK INPUT
+   ========================================================= */
+.task-input {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+#task-form {
+    background-color: var(--bg-column);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    max-width: 520px;
+    width: 100%;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    transition: transform var(--transition-slow);
+}
+
+#task-form:hover {
+    transform: translateY(-2px);
+}
+
+#task-form input,
+#task-form textarea {
+    background-color: var(--bg-card);
+    border: 1px solid #1e293b;
+    color: var(--text-main);
+    padding: 0.7rem;
+    border-radius: var(--radius);
+}
+
+#task-form button {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: #020617;
+    border: none;
+    padding: 0.7rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+#task-form button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
+}
+
+/* =========================================================
+   BOARD & COLUMNS
+   ========================================================= */
+.board {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.25rem;
+}
+
+.column {
+    flex: 1;
+    background-color: var(--bg-column);
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.column h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* =========================================================
+   TASK CARDS
+   ========================================================= */
+.task {
+    background-color: var(--bg-card);
+    padding: 0.85rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-card);
+    border-left: 5px solid var(--todo);
+    animation: fadeInUp 0.35s ease forwards;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.task:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.column[data-status="in-progress"] .task {
+    border-left-color: var(--progress);
+}
+
+.column[data-status="done"] .task {
+    border-left-color: var(--done);
+}
+
+.task p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.6rem;
+}
+
+.actions button {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.actions button:active {
+    transform: scale(0.95);
+}
+
+.actions button[data-action="move"] {
+    background-color: rgba(56, 189, 248, 0.15);
+    color: #7dd3fc;
+}
+
+.actions button[data-action="delete"] {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+.task.moving {
+    animation: pulse 0.3s ease;
+}
+
+.task.removing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.25s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .board {
+        flex-direction: column;
+    }
+}
