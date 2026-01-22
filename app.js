@@ -34,6 +34,16 @@ function updateTaskSummary() {
 }
 
 /* =========================================================
+   EMPTY STATE
+   ========================================================= */
+function renderEmptyState(container, message) {
+    const div = document.createElement("div");
+    div.className = "empty-state";
+    div.textContent = message;
+    container.appendChild(div);
+}
+
+/* =========================================================
    RENDERING
    ========================================================= */
 function renderTasks() {
@@ -41,13 +51,31 @@ function renderTasks() {
     inProgressList.innerHTML = "";
     doneList.innerHTML = "";
 
-    getTasks().forEach(task => {
-        const el = createTaskElement(task);
+    const tasks = getTasks();
 
-        if (task.status === "todo") todoList.appendChild(el);
-        if (task.status === "in-progress") inProgressList.appendChild(el);
-        if (task.status === "done") doneList.appendChild(el);
-    });
+    const todoTasks = tasks.filter(t => t.status === "todo");
+    const progressTasks = tasks.filter(t => t.status === "in-progress");
+    const doneTasks = tasks.filter(t => t.status === "done");
+
+    if (todoTasks.length === 0) {
+        renderEmptyState(todoList, "No tasks in Todo");
+    } else {
+        todoTasks.forEach(task => todoList.appendChild(createTaskElement(task)));
+    }
+
+    if (progressTasks.length === 0) {
+        renderEmptyState(inProgressList, "Nothing in progress");
+    } else {
+        progressTasks.forEach(task =>
+            inProgressList.appendChild(createTaskElement(task))
+        );
+    }
+
+    if (doneTasks.length === 0) {
+        renderEmptyState(doneList, "No completed tasks");
+    } else {
+        doneTasks.forEach(task => doneList.appendChild(createTaskElement(task)));
+    }
 
     updateTaskSummary();
 }

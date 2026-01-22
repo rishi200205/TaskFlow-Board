@@ -102,6 +102,17 @@ header {
     margin-bottom: 1rem;
 }
 
+/* EMPTY STATE */
+.empty-state {
+    padding: 1.2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    border: 1px dashed #334155;
+    border-radius: var(--radius);
+    opacity: 0.8;
+}
+
 /* TASKS */
 .task {
     background-color: var(--bg-card);
