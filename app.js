@@ -11,6 +11,29 @@ const doneList = document.getElementById("done-list");
 let draggedTaskId = null;
 
 /* =========================================================
+   TASK SUMMARY
+   ========================================================= */
+function updateTaskSummary() {
+    const tasks = getTasks();
+
+    const todoCount = tasks.filter(t => t.status === "todo").length;
+    const progressCount = tasks.filter(t => t.status === "in-progress").length;
+    const doneCount = tasks.filter(t => t.status === "done").length;
+
+    document.querySelector('[data-status="todo"] h2').textContent =
+        `Todo (${todoCount})`;
+
+    document.querySelector('[data-status="in-progress"] h2').textContent =
+        `In Progress (${progressCount})`;
+
+    document.querySelector('[data-status="done"] h2').textContent =
+        `Done (${doneCount})`;
+
+    document.getElementById("task-summary").textContent =
+        `Total Tasks: ${tasks.length}`;
+}
+
+/* =========================================================
    RENDERING
    ========================================================= */
 function renderTasks() {
@@ -25,6 +48,8 @@ function renderTasks() {
         if (task.status === "in-progress") inProgressList.appendChild(el);
         if (task.status === "done") doneList.appendChild(el);
     });
+
+    updateTaskSummary();
 }
 
 function createTaskElement(task) {
@@ -63,7 +88,7 @@ taskForm.addEventListener("submit", e => {
 });
 
 /* =========================================================
-   CLICK ACTIONS (DELEGATION)
+   CLICK ACTIONS
    ========================================================= */
 document.querySelector(".board").addEventListener("click", e => {
     const action = e.target.dataset.action;
