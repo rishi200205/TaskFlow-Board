@@ -1,6 +1,5 @@
 // app.js
 
-// DOM Elements
 const taskForm = document.getElementById("task-form");
 const titleInput = document.getElementById("task-title");
 const descInput = document.getElementById("task-description");
@@ -9,26 +8,22 @@ const todoList = document.getElementById("todo-list");
 const inProgressList = document.getElementById("in-progress-list");
 const doneList = document.getElementById("done-list");
 
-// ---------- Rendering ----------
+let draggedTaskId = null;
 
+/* =========================================================
+   RENDERING
+   ========================================================= */
 function renderTasks() {
-    // Clear existing UI
     todoList.innerHTML = "";
     inProgressList.innerHTML = "";
     doneList.innerHTML = "";
 
-    const tasks = getTasks();
+    getTasks().forEach(task => {
+        const el = createTaskElement(task);
 
-    tasks.forEach(task => {
-        const taskEl = createTaskElement(task);
-
-        if (task.status === "todo") {
-            todoList.appendChild(taskEl);
-        } else if (task.status === "in-progress") {
-            inProgressList.appendChild(taskEl);
-        } else if (task.status === "done") {
-            doneList.appendChild(taskEl);
-        }
+        if (task.status === "todo") todoList.appendChild(el);
+        if (task.status === "in-progress") inProgressList.appendChild(el);
+        if (task.status === "done") doneList.appendChild(el);
     });
 }
 
@@ -36,6 +31,7 @@ function createTaskElement(task) {
     const div = document.createElement("div");
     div.className = "task";
     div.dataset.id = task.id;
+    div.draggable = true;
 
     div.innerHTML = `
     <h3>${task.title}</h3>
@@ -49,18 +45,15 @@ function createTaskElement(task) {
     return div;
 }
 
-// ---------- Events ----------
-
-// Add Task
-taskForm.addEventListener("submit", function (e) {
+/* =========================================================
+   ADD TASK
+   ========================================================= */
+taskForm.addEventListener("submit", e => {
     e.preventDefault();
 
-    const title = titleInput.value;
-    const description = descInput.value;
+    if (!titleInput.value.trim()) return;
 
-    if (!title.trim()) return;
-
-    addTask(title, description);
+    addTask(titleInput.value, descInput.value);
     saveTasksToStorage(getTasks());
 
     titleInput.value = "";
@@ -69,40 +62,78 @@ taskForm.addEventListener("submit", function (e) {
     renderTasks();
 });
 
-// Event Delegation for Task Actions
-document.querySelector(".board").addEventListener("click", function (e) {
+/* =========================================================
+   CLICK ACTIONS (DELEGATION)
+   ========================================================= */
+document.querySelector(".board").addEventListener("click", e => {
     const action = e.target.dataset.action;
     if (!action) return;
 
     const taskEl = e.target.closest(".task");
-    if (!taskEl) return;
-
     const taskId = taskEl.dataset.id;
 
     if (action === "delete") {
-        deleteTask(taskId);
+        taskEl.classList.add("removing");
+        setTimeout(() => {
+            deleteTask(taskId);
+            saveTasksToStorage(getTasks());
+            renderTasks();
+        }, 250);
+        return;
     }
 
     if (action === "move") {
         const task = getTasks().find(t => t.id === taskId);
         if (!task) return;
 
-        if (task.status === "todo") {
-            updateTaskStatus(taskId, "in-progress");
-        } else if (task.status === "in-progress") {
-            updateTaskStatus(taskId, "done");
-        }
-    }
+        const next =
+            task.status === "todo"
+                ? "in-progress"
+                : task.status === "in-progress"
+                    ? "done"
+                    : "done";
 
-    saveTasksToStorage(getTasks());
-    renderTasks();
+        updateTaskStatus(taskId, next);
+        saveTasksToStorage(getTasks());
+        renderTasks();
+    }
 });
 
-// ---------- Initial Load ----------
+/* =========================================================
+   DRAG & DROP
+   ========================================================= */
+document.addEventListener("dragstart", e => {
+    const task = e.target.closest(".task");
+    if (!task) return;
+    draggedTaskId = task.dataset.id;
+    task.classList.add("moving");
+});
 
+document.addEventListener("dragend", e => {
+    const task = e.target.closest(".task");
+    if (!task) return;
+    task.classList.remove("moving");
+});
+
+document.querySelectorAll(".column").forEach(column => {
+    column.addEventListener("dragover", e => e.preventDefault());
+
+    column.addEventListener("drop", e => {
+        e.preventDefault();
+        if (!draggedTaskId) return;
+
+        updateTaskStatus(draggedTaskId, column.dataset.status);
+        saveTasksToStorage(getTasks());
+        renderTasks();
+        draggedTaskId = null;
+    });
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
 function init() {
-    const storedTasks = loadTasksFromStorage();
-    setTasks(storedTasks);
+    setTasks(loadTasksFromStorage());
     renderTasks();
 }
 
