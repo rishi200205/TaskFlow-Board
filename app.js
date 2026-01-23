@@ -4,6 +4,7 @@ const taskForm = document.getElementById("task-form");
 const titleInput = document.getElementById("task-title");
 const descInput = document.getElementById("task-description");
 const searchInput = document.getElementById("search-input");
+const clearBtn = document.getElementById("clear-board-btn");
 
 const todoList = document.getElementById("todo-list");
 const inProgressList = document.getElementById("in-progress-list");
@@ -65,12 +66,7 @@ function renderTasks() {
         t.title.toLowerCase().includes(query)
     );
 
-    const buckets = {
-        todo: [],
-        "in-progress": [],
-        done: []
-    };
-
+    const buckets = { todo: [], "in-progress": [], done: [] };
     tasks.forEach(t => buckets[t.status].push(t));
 
     Object.entries(buckets).forEach(([status, list]) => {
@@ -80,7 +76,7 @@ function renderTasks() {
                     doneList;
 
         if (list.length === 0) {
-            renderEmptyState(container, "No matching tasks");
+            renderEmptyState(container, "No tasks here");
         } else {
             list.forEach(task => container.appendChild(createTaskElement(task)));
         }
@@ -126,6 +122,21 @@ taskForm.addEventListener("submit", e => {
 
 /* SEARCH */
 searchInput.addEventListener("input", renderTasks);
+
+/* =========================================================
+   CLEAR BOARD (DESTRUCTIVE)
+   ========================================================= */
+clearBtn.addEventListener("click", () => {
+    const confirmed = confirm(
+        "This will permanently delete all tasks. Are you sure?"
+    );
+
+    if (!confirmed) return;
+
+    setTasks([]);
+    saveTasksToStorage([]);
+    renderTasks();
+});
 
 /* =========================================================
    ACTIONS

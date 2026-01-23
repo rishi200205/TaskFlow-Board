@@ -7,9 +7,7 @@
     --text-muted: #6b7280;
 
     --accent-primary: #14b8a6;
-    /* teal */
-    --accent-secondary: #fb7185;
-    /* coral */
+    --accent-danger: #ef4444;
 
     --todo: #64748b;
     --progress: #f59e0b;
@@ -43,7 +41,6 @@ header {
 #task-summary {
     margin-top: 0.4rem;
     font-size: 0.9rem;
-    opacity: 0.9;
 }
 
 /* INPUT */
@@ -97,6 +94,23 @@ header {
     border: 1px solid #d1d5db;
 }
 
+/* CONTROLS */
+.controls {
+    padding: 0 1.5rem 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+#clear-board-btn {
+    background-color: var(--accent-danger);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
 /* BOARD */
 .board {
     display: flex;
@@ -115,14 +129,6 @@ header {
 .column h2 {
     text-align: center;
     margin-bottom: 1rem;
-}
-
-.timestamp {
-    display: block;
-    margin-top: 0.35rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    opacity: 0.85;
 }
 
 /* EMPTY STATE */
@@ -153,6 +159,13 @@ header {
     border-left-color: var(--done);
 }
 
+.timestamp {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
 /* ACTIONS */
 .actions {
     display: flex;
@@ -166,16 +179,6 @@ header {
     border-radius: 999px;
     border: none;
     cursor: pointer;
-}
-
-.actions button[data-action="move"] {
-    background-color: var(--accent-primary);
-    color: white;
-}
-
-.actions button[data-action="delete"] {
-    background-color: var(--accent-secondary);
-    color: white;
 }
 
 /* RESPONSIVE */
