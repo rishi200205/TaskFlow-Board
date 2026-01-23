@@ -3,6 +3,7 @@
 const taskForm = document.getElementById("task-form");
 const titleInput = document.getElementById("task-title");
 const descInput = document.getElementById("task-description");
+const priorityInput = document.getElementById("task-priority");
 const searchInput = document.getElementById("search-input");
 const clearBtn = document.getElementById("clear-board-btn");
 
@@ -12,9 +13,7 @@ const doneList = document.getElementById("done-list");
 
 let draggedTaskId = null;
 
-/* =========================================================
-   UTIL — TIME FORMATTER
-   ========================================================= */
+/* TIME FORMAT */
 function formatTimeAgo(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
     if (seconds < 60) return "Just now";
@@ -26,9 +25,7 @@ function formatTimeAgo(timestamp) {
     return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
-/* =========================================================
-   TASK SUMMARY
-   ========================================================= */
+/* SUMMARY */
 function updateTaskSummary(tasks) {
     document.querySelector('[data-status="todo"] h2').textContent =
         `Todo (${tasks.filter(t => t.status === "todo").length})`;
@@ -43,9 +40,7 @@ function updateTaskSummary(tasks) {
         `Total Tasks: ${tasks.length}`;
 }
 
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
+/* EMPTY STATE */
 function renderEmptyState(container, message) {
     const div = document.createElement("div");
     div.className = "empty-state";
@@ -53,9 +48,7 @@ function renderEmptyState(container, message) {
     container.appendChild(div);
 }
 
-/* =========================================================
-   RENDERING
-   ========================================================= */
+/* RENDER */
 function renderTasks() {
     todoList.innerHTML = "";
     inProgressList.innerHTML = "";
@@ -87,11 +80,16 @@ function renderTasks() {
 
 function createTaskElement(task) {
     const div = document.createElement("div");
-    div.className = "task";
+    div.className = `task priority-${task.priority}`;
     div.dataset.id = task.id;
     div.draggable = true;
 
     div.innerHTML = `
+    <div class="task-header">
+      <span class="priority-badge ${task.priority}">
+        ${task.priority.toUpperCase()}
+      </span>
+    </div>
     <h3>${task.title}</h3>
     <p>${task.description}</p>
     <small class="timestamp">Created ${formatTimeAgo(task.createdAt)}</small>
@@ -104,18 +102,22 @@ function createTaskElement(task) {
     return div;
 }
 
-/* =========================================================
-   ADD TASK
-   ========================================================= */
+/* ADD TASK */
 taskForm.addEventListener("submit", e => {
     e.preventDefault();
     if (!titleInput.value.trim()) return;
 
-    addTask(titleInput.value, descInput.value);
+    addTask(
+        titleInput.value,
+        descInput.value,
+        priorityInput.value
+    );
+
     saveTasksToStorage(getTasks());
 
     titleInput.value = "";
     descInput.value = "";
+    priorityInput.value = "medium";
 
     renderTasks();
 });
@@ -123,24 +125,15 @@ taskForm.addEventListener("submit", e => {
 /* SEARCH */
 searchInput.addEventListener("input", renderTasks);
 
-/* =========================================================
-   CLEAR BOARD (DESTRUCTIVE)
-   ========================================================= */
+/* CLEAR BOARD */
 clearBtn.addEventListener("click", () => {
-    const confirmed = confirm(
-        "This will permanently delete all tasks. Are you sure?"
-    );
-
-    if (!confirmed) return;
-
+    if (!confirm("This will permanently delete all tasks. Continue?")) return;
     setTasks([]);
     saveTasksToStorage([]);
     renderTasks();
 });
 
-/* =========================================================
-   ACTIONS
-   ========================================================= */
+/* ACTIONS */
 document.querySelector(".board").addEventListener("click", e => {
     const action = e.target.dataset.action;
     if (!action) return;
@@ -149,12 +142,7 @@ document.querySelector(".board").addEventListener("click", e => {
 
     if (action === "delete") {
         deleteTask(taskId);
-        saveTasksToStorage(getTasks());
-        renderTasks();
-        return;
-    }
-
-    if (action === "move") {
+    } else if (action === "move") {
         const task = getTasks().find(t => t.id === taskId);
         const next =
             task.status === "todo"
@@ -162,22 +150,14 @@ document.querySelector(".board").addEventListener("click", e => {
                 : task.status === "in-progress"
                     ? "done"
                     : "done";
-
         updateTaskStatus(taskId, next);
-        saveTasksToStorage(getTasks());
-        renderTasks();
     }
+
+    saveTasksToStorage(getTasks());
+    renderTasks();
 });
 
-/* =========================================================
-   DRAG & DROP
-   ========================================================= */
-document.addEventListener("dragstart", e => {
-    const task = e.target.closest(".task");
-    if (!task) return;
-    draggedTaskId = task.dataset.id;
-});
-
+/* DRAG & DROP */
 document.querySelectorAll(".column").forEach(column => {
     column.addEventListener("dragover", e => e.preventDefault());
     column.addEventListener("drop", e => {
@@ -189,6 +169,12 @@ document.querySelectorAll(".column").forEach(column => {
         renderTasks();
         draggedTaskId = null;
     });
+});
+
+document.addEventListener("dragstart", e => {
+    const task = e.target.closest(".task");
+    if (!task) return;
+    draggedTaskId = task.dataset.id;
 });
 
 /* INIT */

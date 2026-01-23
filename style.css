@@ -1,22 +1,35 @@
+/* =========================================================
+   DESIGN SYSTEM
+   ========================================================= */
 :root {
-    --bg-main: #f5f7fa;
-    --bg-column: #eef1f6;
+    /* Backgrounds */
+    --bg-main: #f4f6fb;
+    --bg-column: #eef1f7;
     --bg-card: #ffffff;
 
+    /* Text */
     --text-main: #1f2937;
     --text-muted: #6b7280;
 
-    --accent-primary: #14b8a6;
+    /* Accents */
+    --accent-primary: #6366f1;
+    /* indigo */
+    --accent-secondary: #22c55e;
     --accent-danger: #ef4444;
 
-    --todo: #64748b;
-    --progress: #f59e0b;
-    --done: #22c55e;
+    /* Priority */
+    --priority-low: #22c55e;
+    --priority-medium: #f59e0b;
+    --priority-high: #ef4444;
 
+    /* UI */
     --radius: 14px;
     --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* =========================================================
+   RESET & BASE
+   ========================================================= */
 * {
     margin: 0;
     padding: 0;
@@ -24,14 +37,17 @@
 }
 
 body {
-    font-family: system-ui, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
+    min-height: 100vh;
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+   ========================================================= */
 header {
-    background: linear-gradient(135deg, #14b8a6, #38bdf8);
+    background: linear-gradient(135deg, #6366f1, #818cf8);
     color: white;
     padding: 1.6rem;
     text-align: center;
@@ -41,9 +57,12 @@ header {
 #task-summary {
     margin-top: 0.4rem;
     font-size: 0.9rem;
+    opacity: 0.9;
 }
 
-/* INPUT */
+/* =========================================================
+   TASK INPUT
+   ========================================================= */
 .task-input {
     padding: 1.5rem;
     display: flex;
@@ -63,10 +82,12 @@ header {
 }
 
 #task-form input,
-#task-form textarea {
+#task-form textarea,
+#task-form select {
     padding: 0.7rem;
     border-radius: var(--radius);
     border: 1px solid #d1d5db;
+    font-size: 0.95rem;
 }
 
 #task-form button {
@@ -79,8 +100,11 @@ header {
     font-weight: 600;
 }
 
-/* SEARCH */
-.search-bar {
+/* =========================================================
+   SEARCH & CONTROLS
+   ========================================================= */
+.search-bar,
+.controls {
     padding: 0 1.5rem 1rem;
     display: flex;
     justify-content: center;
@@ -94,31 +118,28 @@ header {
     border: 1px solid #d1d5db;
 }
 
-/* CONTROLS */
-.controls {
-    padding: 0 1.5rem 1rem;
-    display: flex;
-    justify-content: center;
-}
-
 #clear-board-btn {
     background-color: var(--accent-danger);
     color: white;
     border: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.6rem 1.3rem;
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
 }
 
-/* BOARD */
+/* =========================================================
+   BOARD LAYOUT
+   ========================================================= */
 .board {
     display: flex;
     gap: 1.25rem;
     padding: 1.25rem;
 }
 
-/* COLUMNS */
+/* =========================================================
+   COLUMNS
+   ========================================================= */
 .column {
     flex: 1;
     background-color: var(--bg-column);
@@ -129,9 +150,12 @@ header {
 .column h2 {
     text-align: center;
     margin-bottom: 1rem;
+    font-size: 1.05rem;
 }
 
-/* EMPTY STATE */
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
 .empty-state {
     padding: 1rem;
     text-align: center;
@@ -141,32 +165,67 @@ header {
     border-radius: var(--radius);
 }
 
-/* TASKS */
+/* =========================================================
+   TASK CARD
+   ========================================================= */
 .task {
     background-color: var(--bg-card);
     padding: 0.85rem;
     border-radius: var(--radius);
     margin-bottom: 0.75rem;
     box-shadow: var(--shadow-soft);
-    border-left: 5px solid var(--todo);
 }
 
-.column[data-status="in-progress"] .task {
-    border-left-color: var(--progress);
+/* Header row (priority badge) */
+.task-header {
+    display: flex;
+    justify-content: flex-end;
 }
 
-.column[data-status="done"] .task {
-    border-left-color: var(--done);
+/* Priority badge */
+.priority-badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
 }
 
+.priority-badge.low {
+    background-color: var(--priority-low);
+}
+
+.priority-badge.medium {
+    background-color: var(--priority-medium);
+}
+
+.priority-badge.high {
+    background-color: var(--priority-high);
+}
+
+/* Task text */
+.task h3 {
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+}
+
+.task p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* Timestamp */
 .timestamp {
     display: block;
-    margin-top: 0.35rem;
+    margin-top: 0.3rem;
     font-size: 0.75rem;
     color: var(--text-muted);
 }
 
-/* ACTIONS */
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
 .actions {
     display: flex;
     justify-content: space-between;
@@ -181,7 +240,9 @@ header {
     cursor: pointer;
 }
 
-/* RESPONSIVE */
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 @media (max-width: 768px) {
     .board {
         flex-direction: column;

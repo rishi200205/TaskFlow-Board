@@ -18,7 +18,16 @@
     <section class="task-input">
         <form id="task-form">
             <input type="text" id="task-title" placeholder="Task title" required />
+
             <textarea id="task-description" placeholder="Task description"></textarea>
+
+            <!-- PRIORITY SELECT -->
+            <select id="task-priority">
+                <option value="low">Low Priority</option>
+                <option value="medium" selected>Medium Priority</option>
+                <option value="high">High Priority</option>
+            </select>
+
             <button type="submit">Add Task</button>
         </form>
     </section>
@@ -27,7 +36,6 @@
         <input type="text" id="search-input" placeholder="Search tasks by title..." />
     </section>
 
-    <!-- CLEAR BOARD -->
     <section class="controls">
         <button id="clear-board-btn">Clear All Tasks</button>
     </section>
