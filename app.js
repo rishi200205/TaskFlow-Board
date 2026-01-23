@@ -12,21 +12,31 @@ const doneList = document.getElementById("done-list");
 let draggedTaskId = null;
 
 /* =========================================================
+   UTIL — TIME FORMATTER
+   ========================================================= */
+function formatTimeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return "Just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+}
+
+/* =========================================================
    TASK SUMMARY
    ========================================================= */
 function updateTaskSummary(tasks) {
-    const todoCount = tasks.filter(t => t.status === "todo").length;
-    const progressCount = tasks.filter(t => t.status === "in-progress").length;
-    const doneCount = tasks.filter(t => t.status === "done").length;
-
     document.querySelector('[data-status="todo"] h2').textContent =
-        `Todo (${todoCount})`;
+        `Todo (${tasks.filter(t => t.status === "todo").length})`;
 
     document.querySelector('[data-status="in-progress"] h2').textContent =
-        `In Progress (${progressCount})`;
+        `In Progress (${tasks.filter(t => t.status === "in-progress").length})`;
 
     document.querySelector('[data-status="done"] h2').textContent =
-        `Done (${doneCount})`;
+        `Done (${tasks.filter(t => t.status === "done").length})`;
 
     document.getElementById("task-summary").textContent =
         `Total Tasks: ${tasks.length}`;
@@ -43,7 +53,7 @@ function renderEmptyState(container, message) {
 }
 
 /* =========================================================
-   RENDERING (WITH SEARCH FILTER)
+   RENDERING
    ========================================================= */
 function renderTasks() {
     todoList.innerHTML = "";
@@ -51,37 +61,32 @@ function renderTasks() {
     doneList.innerHTML = "";
 
     const query = searchInput.value.toLowerCase();
-    const allTasks = getTasks();
-
-    const filteredTasks = allTasks.filter(task =>
-        task.title.toLowerCase().includes(query)
+    const tasks = getTasks().filter(t =>
+        t.title.toLowerCase().includes(query)
     );
 
-    const todoTasks = filteredTasks.filter(t => t.status === "todo");
-    const progressTasks = filteredTasks.filter(t => t.status === "in-progress");
-    const doneTasks = filteredTasks.filter(t => t.status === "done");
+    const buckets = {
+        todo: [],
+        "in-progress": [],
+        done: []
+    };
 
-    if (todoTasks.length === 0) {
-        renderEmptyState(todoList, "No matching tasks");
-    } else {
-        todoTasks.forEach(task => todoList.appendChild(createTaskElement(task)));
-    }
+    tasks.forEach(t => buckets[t.status].push(t));
 
-    if (progressTasks.length === 0) {
-        renderEmptyState(inProgressList, "No matching tasks");
-    } else {
-        progressTasks.forEach(task =>
-            inProgressList.appendChild(createTaskElement(task))
-        );
-    }
+    Object.entries(buckets).forEach(([status, list]) => {
+        const container =
+            status === "todo" ? todoList :
+                status === "in-progress" ? inProgressList :
+                    doneList;
 
-    if (doneTasks.length === 0) {
-        renderEmptyState(doneList, "No matching tasks");
-    } else {
-        doneTasks.forEach(task => doneList.appendChild(createTaskElement(task)));
-    }
+        if (list.length === 0) {
+            renderEmptyState(container, "No matching tasks");
+        } else {
+            list.forEach(task => container.appendChild(createTaskElement(task)));
+        }
+    });
 
-    updateTaskSummary(filteredTasks);
+    updateTaskSummary(tasks);
 }
 
 function createTaskElement(task) {
@@ -93,6 +98,7 @@ function createTaskElement(task) {
     div.innerHTML = `
     <h3>${task.title}</h3>
     <p>${task.description}</p>
+    <small class="timestamp">Created ${formatTimeAgo(task.createdAt)}</small>
     <div class="actions">
       <button data-action="move">Move</button>
       <button data-action="delete">Delete</button>
@@ -118,20 +124,17 @@ taskForm.addEventListener("submit", e => {
     renderTasks();
 });
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
+/* SEARCH */
 searchInput.addEventListener("input", renderTasks);
 
 /* =========================================================
-   CLICK ACTIONS
+   ACTIONS
    ========================================================= */
 document.querySelector(".board").addEventListener("click", e => {
     const action = e.target.dataset.action;
     if (!action) return;
 
-    const taskEl = e.target.closest(".task");
-    const taskId = taskEl.dataset.id;
+    const taskId = e.target.closest(".task").dataset.id;
 
     if (action === "delete") {
         deleteTask(taskId);
@@ -142,8 +145,6 @@ document.querySelector(".board").addEventListener("click", e => {
 
     if (action === "move") {
         const task = getTasks().find(t => t.id === taskId);
-        if (!task) return;
-
         const next =
             task.status === "todo"
                 ? "in-progress"
@@ -166,10 +167,6 @@ document.addEventListener("dragstart", e => {
     draggedTaskId = task.dataset.id;
 });
 
-document.addEventListener("dragend", () => {
-    draggedTaskId = null;
-});
-
 document.querySelectorAll(".column").forEach(column => {
     column.addEventListener("dragover", e => e.preventDefault());
     column.addEventListener("drop", e => {
@@ -179,12 +176,11 @@ document.querySelectorAll(".column").forEach(column => {
         updateTaskStatus(draggedTaskId, column.dataset.status);
         saveTasksToStorage(getTasks());
         renderTasks();
+        draggedTaskId = null;
     });
 });
 
-/* =========================================================
-   INIT
-   ========================================================= */
+/* INIT */
 function init() {
     setTasks(loadTasksFromStorage());
     renderTasks();
